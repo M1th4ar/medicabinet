@@ -161,7 +161,7 @@ const Dashboard = () => {
       setNewAppt('');
       fetchData();
     } catch {
-      setApptMessage('Failed to schedule appointment');
+      setApptMessage('You already have a scheduled appointment');
     }
   };
 
@@ -188,170 +188,172 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1 style={{ color: '#2c3e50', margin: 0 }}>Patient Dashboard</h1>
-        <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
-      </header>
-      
-      {error && <p style={{ color: '#e74c3c' }}>{error}</p>}
+      <div style={styles.container}>
+        <header style={styles.header}>
+          <h1 style={{ color: '#2c3e50', margin: 0 }}>Patient Dashboard</h1>
+          <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+        </header>
 
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Schedule New Appointment</h2>
-        <form onSubmit={handleSchedule}>
-          <div style={styles.formGroup}>
-            <input 
-              type="date"
-              value={newAppt}
-              onChange={(e) => setNewAppt(e.target.value)}
-              required
-              min={today}
-              style={styles.dateInput}
-            />
-            <button 
-              type="submit" 
-              disabled={!newAppt} 
-              style={styles.primaryBtn}
-            >
-              Schedule
-            </button>
-          </div>
-          {apptMessage && (
-            <p style={{ 
-              color: apptMessage.includes('success') ? '#28a745' : '#dc3545',
-              fontWeight: '500'
-            }}>
-              {apptMessage}
-            </p>
-          )}
-        </form>
-      </section>
+        {error && <p style={{ color: '#e74c3c' }}>{error}</p>}
 
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>My Appointments</h2>
-        {appointments.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p>No appointments scheduled</p>
-          </div>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.tableHeader}>ID</th>
-                <th style={styles.tableHeader}>Date & Time</th>
-                <th style={styles.tableHeader}>Status</th>
-                <th style={styles.tableHeader}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointments.map(appt => (
-                <tr key={appt.appointment_id}>
-                  <td style={styles.tableCell}>{appt.appointment_id}</td>
-                  <td style={styles.tableCell}>
-                    {new Date(appt.time).toLocaleString()}
-                  </td>
-                  <td style={styles.tableCell}>
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>Schedule New Appointment</h2>
+          <form onSubmit={handleSchedule}>
+            <div style={styles.formGroup}>
+              <input
+                  type="date"
+                  value={newAppt}
+                  onChange={(e) => setNewAppt(e.target.value)}
+                  required
+                  min={today}
+                  max={new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} // max 60 days = ~2 months
+                  style={styles.dateInput}
+              />
+              <button
+                  type="submit"
+                  disabled={!newAppt}
+                  style={styles.primaryBtn}
+              >
+                Schedule
+              </button>
+            </div>
+            {apptMessage && (
+                <p style={{
+                  color: apptMessage.includes('success') ? '#28a745' : '#dc3545',
+                  fontWeight: '500'
+                }}>
+                  {apptMessage}
+                </p>
+            )}
+          </form>
+        </section>
+
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>My Appointments</h2>
+          {appointments.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p>No appointments scheduled</p>
+              </div>
+          ) : (
+              <table style={styles.table}>
+                <thead>
+                <tr>
+                  <th style={styles.tableHeader}>ID</th>
+                  <th style={styles.tableHeader}>Date & Time</th>
+                  <th style={styles.tableHeader}>Status</th>
+                  <th style={styles.tableHeader}>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {appointments.map(appt => (
+                    <tr key={appt.appointment_id}>
+                      <td style={styles.tableCell}>{appt.appointment_id}</td>
+                      <td style={styles.tableCell}>
+                        {new Date(appt.time).toLocaleString()}
+                      </td>
+                      <td style={styles.tableCell}>
                     <span style={styles.statusBadge(appt.status)}>
                       {appt.status}
                     </span>
-                  </td>
-                  <td style={{ ...styles.tableCell, display: 'flex', gap: '10px' }}>
-                    <Reschedule 
-                      apptId={appt.appointment_id} 
-                      token={token} 
-                      onSuccess={fetchData} 
-                    />
-                    <button 
-                      onClick={() => handleCancel(appt.appointment_id)} 
-                      style={styles.dangerBtn}
-                    >
-                      Cancel
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+                      </td>
+                      <td style={{ ...styles.tableCell, display: 'flex', gap: '10px' }}>
+                        <Reschedule
+                            apptId={appt.appointment_id}
+                            token={token}
+                            onSuccess={fetchData}
+                        />
+                        <button
+                            onClick={() => handleCancel(appt.appointment_id)}
+                            style={styles.dangerBtn}
+                        >
+                          Cancel
+                        </button>
+                      </td>
+                    </tr>
+                ))}
+                </tbody>
+              </table>
+          )}
+        </section>
 
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Prescriptions</h2>
-        {prescriptions.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p>No prescriptions available</p>
-          </div>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.tableHeader}>ID</th>
-                <th style={styles.tableHeader}>Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {prescriptions.map(p => (
-                <tr key={p.prescription_id}>
-                  <td style={styles.tableCell}>{p.prescription_id}</td>
-                  <td style={styles.tableCell}>
-                    <div style={{ whiteSpace: 'pre-wrap' }}>
-                      {p.content || 'No details available'}
-                    </div>
-                  </td>
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>Prescriptions</h2>
+          {prescriptions.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p>No prescriptions available</p>
+              </div>
+          ) : (
+              <table style={styles.table}>
+                <thead>
+                <tr>
+                  <th style={styles.tableHeader}>ID</th>
+                  <th style={styles.tableHeader}>Details</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                {prescriptions.map(p => (
+                    <tr key={p.prescription_id}>
+                      <td style={styles.tableCell}>{p.prescription_id}</td>
+                      <td style={styles.tableCell}>
+                        <div style={{ whiteSpace: 'pre-wrap' }}>
+                          {p.content || 'No details available'}
+                        </div>
+                      </td>
+                    </tr>
+                ))}
+                </tbody>
+              </table>
+          )}
+        </section>
 
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Consultations</h2>
-        {consultations.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p>No consultation records</p>
-          </div>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.tableHeader}>ID</th>
-                <th style={styles.tableHeader}>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {consultations.map(c => (
-                <tr key={c.consultation_id}>
-                  <td style={styles.tableCell}>{c.consultation_id}</td>
-                  <td style={styles.tableCell}>
-                    <div style={{ whiteSpace: 'pre-wrap' }}>
-                      {c.notes || 'No notes available'}
-                    </div>
-                  </td>
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>Consultations</h2>
+          {consultations.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p>No consultation records</p>
+              </div>
+          ) : (
+              <table style={styles.table}>
+                <thead>
+                <tr>
+                  <th style={styles.tableHeader}>ID</th>
+                  <th style={styles.tableHeader}>Notes</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
-    </div>
+                </thead>
+                <tbody>
+                {consultations.map(c => (
+                    <tr key={c.consultation_id}>
+                      <td style={styles.tableCell}>{c.consultation_id}</td>
+                      <td style={styles.tableCell}>
+                        <div style={{ whiteSpace: 'pre-wrap' }}>
+                          {c.notes || 'No notes available'}
+                        </div>
+                      </td>
+                    </tr>
+                ))}
+                </tbody>
+              </table>
+          )}
+        </section>
+      </div>
   );
 };
 
 const Reschedule = ({ apptId, token, onSuccess }) => {
   const today = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const maxDate = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const [newTime, setNewTime] = useState('');
   const [isRescheduling, setIsRescheduling] = useState(false);
 
   const reschedule = async () => {
     if (!newTime) return;
-    
+
     try {
       setIsRescheduling(true);
       await axios.put(
-        `patient/appointments/${apptId}`, 
-        { time: newTime }, 
-        { headers: { Authorization: `Bearer ${token}` } }
+          `patient/appointments/${apptId}`,
+          { time: newTime },
+          { headers: { Authorization: `Bearer ${token}` } }
       );
       alert('Appointment rescheduled successfully!');
       setNewTime('');
@@ -364,36 +366,37 @@ const Reschedule = ({ apptId, token, onSuccess }) => {
   };
 
   return (
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-      <input 
-        type="date" 
-        min={today}
-        onChange={(e) => setNewTime(e.target.value)} 
-        value={newTime}
-        required
-        style={{
-          padding: '8px',
-          border: '1px solid #ddd',
-          borderRadius: '4px',
-          fontSize: '14px'
-        }}
-      />
-      <button 
-        onClick={reschedule} 
-        disabled={!newTime || isRescheduling}
-        style={{
-          backgroundColor: '#28a745',
-          color: 'white',
-          border: 'none',
-          padding: '6px 12px',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontSize: '14px'
-        }}
-      >
-        {isRescheduling ? 'Processing...' : 'Reschedule'}
-      </button>
-    </div>
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <input
+            type="date"
+            min={today}
+            max={new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} // max 60 days = ~2 months
+            onChange={(e) => setNewTime(e.target.value)}
+            value={newTime}
+            required
+            style={{
+              padding: '8px',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              fontSize: '14px'
+            }}
+        />
+        <button
+            onClick={reschedule}
+            disabled={!newTime || isRescheduling}
+            style={{
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+        >
+          {isRescheduling ? 'Processing...' : 'Reschedule'}
+        </button>
+      </div>
   );
 };
 
