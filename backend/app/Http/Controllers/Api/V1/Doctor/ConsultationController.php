@@ -10,9 +10,18 @@ use App\Models\Patient;
 class ConsultationController extends Controller
 {
     // View all consultations
-    public function index()
+    // In Doctor/ConsultationController.php
+    public function index(Request $request)
     {
-        $consultations = Consultation::with('patient')->latest()->get();
+        $request->validate([
+            'patient_id' => 'required|exists:patients,id'
+        ]);
+
+        $consultations = Consultation::with('patient')
+            ->where('patient_id', $request->patient_id)
+            ->latest()
+            ->get();
+
         return response()->json(['consultations' => $consultations]);
     }
 

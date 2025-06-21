@@ -9,9 +9,18 @@ use App\Models\Prescription;
 class PrescriptionController extends Controller
 {
     // View all prescriptions
-    public function index()
+    // In Doctor/PrescriptionController.php
+    public function index(Request $request)
     {
-        $prescriptions = Prescription::with('patient')->latest()->get();
+        $request->validate([
+            'patient_id' => 'required|exists:patients,id'
+        ]);
+
+        $prescriptions = Prescription::with('patient')
+            ->where('patient_id', $request->patient_id)
+            ->latest()
+            ->get();
+
         return response()->json(['prescriptions' => $prescriptions]);
     }
 
