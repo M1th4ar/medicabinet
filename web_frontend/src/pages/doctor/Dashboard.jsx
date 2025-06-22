@@ -451,6 +451,17 @@ const DoctorDashboard = () => {
     );
   };
 
+  const groupAppointmentsByDate = (appts) => {
+    return appts.reduce((groups, appointment) => {
+      const dateKey = new Date(appointment.time).toDateString();
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(appointment);
+      return groups;
+    }, {});
+  };
+
   // Calculate statistics
   const todaysAppointmentsCount = appointments.filter(a => isToday(a.time)).length;
   const completedAppointmentsCount = appointments.filter(a => a.status === 'completed').length;
@@ -529,10 +540,8 @@ const DoctorDashboard = () => {
     return true;
   });
 
-  // Sort appointments by date (newest first)
-  const sortedAppointments = [...filteredAppointments].sort((a, b) => {
-    return new Date(b.time) - new Date(a.time);
-  });
+  // Group appointments by date
+  const groupedAppointments = groupAppointmentsByDate(filteredAppointments);
 
   return (
       <div className="doctor-dashboard">
@@ -614,63 +623,77 @@ const DoctorDashboard = () => {
                 <div className="loading-spinner"></div>
                 <p>Loading appointments...</p>
               </div>
-          ) : sortedAppointments.length === 0 ? (
-              <div className="empty-state">
-                <p>No appointments found</p>
-              </div>
-          ) : (
-              <div className="appointments-grid">
-                {sortedAppointments.map(appt => (
-                    <div key={appt.appointment_id} className="appointment-card">
-                      <div className="appointment-header">
-                        <span className={`status-badge ${appt.status}`}>{appt.status}</span>
-                        <span className="appointment-time">
+          ) : Object.keys(groupedAppointments).length > 0 ? (
+              Object.entries(groupedAppointments)
+                  .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+                  .map(([date, dateAppointments]) => (
+                      <div key={date} className="date-group">
+                        <h3 className="date-header">
+                          {new Date(date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </h3>
+                        <div className="appointments-grid">
+                          {dateAppointments
+                              .sort((a, b) => new Date(a.time) - new Date(b.time))
+                              .map(appt => (
+                                  <div key={appt.appointment_id} className="appointment-card">
+                                    <div className="appointment-header">
+                                      <span className={`status-badge ${appt.status}`}>{appt.status}</span>
+                                      <span className="appointment-time">
                     {new Date(appt.time).toLocaleString([], {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
                     })}
                   </span>
-                      </div>
+                                    </div>
 
-                      <div className="patient-info">
-                        <div className="patient-avatar">
-                          {patients[appt.patient_id]?.full_name?.charAt(0) || 'P'}
-                        </div>
-                        <div className="patient-details">
-                          <h4>{patients[appt.patient_id]?.full_name || 'Loading...'}</h4>
-                          <p>Patient ID: {appt.patient_id}</p>
-                        </div>
-                      </div>
+                                    <div className="patient-info">
+                                      <div className="patient-avatar">
+                                        {patients[appt.patient_id]?.full_name?.charAt(0) || 'P'}
+                                      </div>
+                                      <div className="patient-details">
+                                        <h4>{patients[appt.patient_id]?.full_name || 'Loading...'}</h4>
+                                        <p>Patient ID: {appt.patient_id}</p>
+                                      </div>
+                                    </div>
 
-                      <div className="appointment-actions">
-                        {appt.status === 'scheduled' && (
-                            <>
-                              <button
-                                  onClick={() => handleStatusUpdate(appt.appointment_id, 'completed')}
-                                  className="action-button complete"
-                              >
-                                Complete
-                              </button>
-                              <button
-                                  onClick={() => handleStatusUpdate(appt.appointment_id, 'cancelled')}
-                                  className="action-button cancel"
-                              >
-                                Cancel
-                              </button>
-                            </>
-                        )}
-                        <button
-                            onClick={() => setSelectedPatientId(appt.patient_id)}
-                            className="action-button view"
-                        >
-                          View Patient
-                        </button>
+                                    <div className="appointment-actions">
+                                      {appt.status === 'scheduled' && (
+                                          <>
+                                            <button
+                                                onClick={() => handleStatusUpdate(appt.appointment_id, 'completed')}
+                                                className="action-button complete"
+                                            >
+                                              Complete
+                                            </button>
+                                            <button
+                                                onClick={() => handleStatusUpdate(appt.appointment_id, 'cancelled')}
+                                                className="action-button cancel"
+                                            >
+                                              Cancel
+                                            </button>
+                                          </>
+                                      )}
+                                      <button
+                                          onClick={() => setSelectedPatientId(appt.patient_id)}
+                                          className="action-button view"
+                                      >
+                                        View Patient
+                                      </button>
+                                    </div>
+                                  </div>
+                              ))}
+                        </div>
                       </div>
-                    </div>
-                ))}
+                  ))
+          ) : (
+              <div className="empty-state">
+                <p>No appointments found</p>
               </div>
           )}
         </div>
@@ -682,6 +705,8 @@ const DoctorDashboard = () => {
                 onClose={() => setSelectedPatientId(null)}
             />
         )}
+
+
 
         <style jsx>{`
           .doctor-dashboard {
