@@ -593,7 +593,7 @@ const DoctorPatient = () => {
                     border-radius: 12px;
                     width: 90%;
                     max-width: 600px;
-                    padding: 30px;
+                    padding: 4rem;
                     position: relative;
                     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
                 }
