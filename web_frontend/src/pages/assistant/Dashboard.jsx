@@ -1,33 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from '../../api/axios';
 
 const PAGE_SIZE = 5;
 
 const getPatientFromResponse = (data) => data.patient || data;
-
-const Pagination = ({ page, total, pageSize, onPageChange }) => {
-  const totalPages = Math.ceil(total / pageSize);
-  
-  return (
-    <div className="pagination">
-      <button 
-        onClick={() => onPageChange(page - 1)} 
-        disabled={page === 1}
-        className="pagination-button"
-      >
-        Prev
-      </button>
-      <span className="pagination-info">Page {page} of {totalPages}</span>
-      <button 
-        onClick={() => onPageChange(page + 1)} 
-        disabled={page === totalPages}
-        className="pagination-button"
-      >
-        Next
-      </button>
-    </div>
-  );
-};
 
 const PatientDetails = ({ patientId, token, onClose }) => {
   const [patient, setPatient] = useState(null);
@@ -66,115 +42,115 @@ const PatientDetails = ({ patientId, token, onClose }) => {
   };
 
   if (loading) return (
-    <div className="modal-overlay">
-      <div className="patient-modal">
-        <div className="loading-spinner"></div>
-        <p>Loading patient details...</p>
+      <div className="modal-overlay">
+        <div className="patient-modal">
+          <div className="loading-spinner"></div>
+          <p>Loading patient details...</p>
+        </div>
       </div>
-    </div>
   );
-  
+
   if (!patient) return (
-    <div className="modal-overlay">
-      <div className="patient-modal">
-        <button onClick={onClose} className="close-button">✖</button>
-        <div className="error-message">Failed to load patient details.</div>
+      <div className="modal-overlay">
+        <div className="patient-modal">
+          <button onClick={onClose} className="close-button">✖</button>
+          <div className="error-message">Failed to load patient details.</div>
+        </div>
       </div>
-    </div>
   );
 
   return (
-    <div className="modal-overlay">
-      <div className="patient-modal">
-        <button onClick={onClose} className="close-button">✖</button>
-        
-        <div className="section">
-          <div className="section-header">
-            <h3>👤 Patient Information</h3>
-            {!editPatient && (
-              <button onClick={() => setEditPatient(true)} className="edit-button">Edit</button>
+      <div className="modal-overlay">
+        <div className="patient-modal">
+          <button onClick={onClose} className="close-button">✖</button>
+
+          <div className="section">
+            <div className="section-header">
+              <h3>👤 Patient Information</h3>
+              {!editPatient && (
+                  <button onClick={() => setEditPatient(true)} className="edit-button">Edit</button>
+              )}
+            </div>
+
+            {editPatient ? (
+                <form onSubmit={handlePatientEdit} className="patient-form">
+                  <div className="form-group">
+                    <label>Full Name</label>
+                    <input
+                        value={patientForm.full_name || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, full_name: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                        value={patientForm.email || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, email: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        value={patientForm.password || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, password: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone</label>
+                    <input
+                        value={patientForm.phone || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, phone: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Address</label>
+                    <input
+                        value={patientForm.address || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, address: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-actions">
+                    <button type="submit" className="primary-button">Save Changes</button>
+                    <button type="button" onClick={() => setEditPatient(false)} className="secondary-button">Cancel</button>
+                  </div>
+                </form>
+            ) : (
+                <div className="patient-info-grid">
+                  <div className="info-item">
+                    <span className="info-label">ID:</span>
+                    <span className="info-value">{patient.id || patientId}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Name:</span>
+                    <span className="info-value">{patient.full_name}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Address:</span>
+                    <span className="info-value">{patient.address || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Gender:</span>
+                    <span className="info-value">{patient.gender || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Email:</span>
+                    <span className="info-value">{patient.email}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Phone:</span>
+                    <span className="info-value">{patient.phone || 'N/A'}</span>
+                  </div>
+                </div>
             )}
           </div>
-          
-          {editPatient ? (
-            <form onSubmit={handlePatientEdit} className="patient-form">
-              <div className="form-group">
-                <label>Full Name</label>
-                <input 
-                  value={patientForm.full_name || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, full_name: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input 
-                  value={patientForm.email || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, email: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input 
-                  type="password"
-                  value={patientForm.password || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, password: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label>Phone</label>
-                <input 
-                  value={patientForm.phone || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, phone: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label>Address</label>
-                <input 
-                  value={patientForm.address || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, address: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="primary-button">Save Changes</button>
-                <button type="button" onClick={() => setEditPatient(false)} className="secondary-button">Cancel</button>
-              </div>
-            </form>
-          ) : (
-            <div className="patient-info-grid">
-              <div className="info-item">
-                <span className="info-label">ID:</span>
-                <span className="info-value">{patient.id || patientId}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Name:</span>
-                <span className="info-value">{patient.full_name}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Address:</span>
-                <span className="info-value">{patient.address || 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Gender:</span>
-                <span className="info-value">{patient.gender || 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Email:</span>
-                <span className="info-value">{patient.email}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Phone:</span>
-                <span className="info-value">{patient.phone || 'N/A'}</span>
-              </div>
-            </div>
-          )}
         </div>
       </div>
-    </div>
   );
 };
 
@@ -187,10 +163,25 @@ const AssistantDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [updatingStatus, setUpdatingStatus] = useState({});
   const [loading, setLoading] = useState(true);
+  const [showTodayOnly, setShowTodayOnly] = useState(false);
+  const [showCompletedOnly, setShowCompletedOnly] = useState(false);
+  const [dateFilter, setDateFilter] = useState('');
+  const [groupedAppointments, setGroupedAppointments] = useState({});
 
   const token = localStorage.getItem('token');
 
-  const fetchAppointments = async () => {
+  const groupAppointmentsByDate = (appts) => {
+    return appts.reduce((groups, appointment) => {
+      const dateKey = new Date(appointment.time).toDateString();
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(appointment);
+      return groups;
+    }, {});
+  };
+
+  const fetchAppointments = useCallback(async () => {
     setLoading(true);
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -201,10 +192,10 @@ const AssistantDashboard = () => {
       const patientData = {};
 
       await Promise.all(
-        patientIds.map(async (id) => {
-          const pRes = await axios.get(`/assistant/patients/${id}`, config);
-          patientData[id] = getPatientFromResponse(pRes.data);
-        })
+          patientIds.map(async (id) => {
+            const pRes = await axios.get(`/assistant/patients/${id}`, config);
+            patientData[id] = getPatientFromResponse(pRes.data);
+          })
       );
 
       setPatients(patientData);
@@ -213,24 +204,61 @@ const AssistantDashboard = () => {
       setError('Failed to load assistant dashboard');
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchAppointments();
-  }, [token]);
+  }, [fetchAppointments]);
+
+  const isToday = (dateStr) => {
+    const today = new Date();
+    const apptDate = new Date(dateStr);
+    return (
+        today.getFullYear() === apptDate.getFullYear() &&
+        today.getMonth() === apptDate.getMonth() &&
+        today.getDate() === apptDate.getDate()
+    );
+  };
+
+  // Filter appointments based on all criteria
+  const filteredAppointments = appointments.filter(a => {
+    const matchesSearch = searchTerm
+        ? patients[a.patient_id]?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+        : true;
+
+    const matchesDate = dateFilter
+        ? new Date(a.time).toLocaleDateString('fr-DZ') === new Date(dateFilter).toLocaleDateString('fr-DZ')
+        : true;
+
+    const matchesToday = showTodayOnly ? isToday(a.time) : true;
+    const matchesCompleted = showCompletedOnly ? a.status === 'completed' : true;
+
+    return matchesSearch && matchesDate && matchesToday && matchesCompleted;
+  });
+
+  // Group the filtered appointments
+  useEffect(() => {
+    const grouped = groupAppointmentsByDate(filteredAppointments);
+    setGroupedAppointments(grouped);
+  }, [filteredAppointments]);
+
+  // Count today's appointments
+  const todaysAppointmentsCount = appointments.filter(a =>
+      isToday(a.time) && a.status === 'scheduled'
+  ).length;
 
   const handleStatusUpdate = async (appointmentId, newStatus) => {
     if (!window.confirm(`Change appointment status to ${newStatus}?`)) return;
-    
+
     try {
       setUpdatingStatus(prev => ({ ...prev, [appointmentId]: true }));
-      
+
       await axios.put(
-        `/assistant/appointments/${appointmentId}`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+          `/assistant/appointments/${appointmentId}`,
+          { status: newStatus },
+          { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       fetchAppointments();
     } catch (err) {
       alert('Failed to update appointment status');
@@ -251,147 +279,310 @@ const AssistantDashboard = () => {
     window.location.href = '/login';
   };
 
-  const isToday = (dateStr) => {
-    const today = new Date();
-    const apptDate = new Date(dateStr);
-    return (
-      today.getFullYear() === apptDate.getFullYear() &&
-      today.getMonth() === apptDate.getMonth() &&
-      today.getDate() === apptDate.getDate()
-    );
-  };
-
-  const sortedAppointments = [...appointments].sort((a, b) => {
-    const aToday = isToday(a.time) && a.status === 'scheduled';
-    const bToday = isToday(b.time) && b.status === 'scheduled';
-    if (aToday && !bToday) return -1;
-    if (!aToday && bToday) return 1;
-    return new Date(b.time) - new Date(a.time);
-  });
-
-  const uniquePatientIds = [...new Set(sortedAppointments.map(a => a.patient_id))];
-  const filteredPatientIds = uniquePatientIds.filter(id => {
-    const patient = patients[id];
-    return patient?.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
-  const patientStart = (patientPage - 1) * PAGE_SIZE;
-  const pagedPatientIds = filteredPatientIds.slice(patientStart, patientStart + PAGE_SIZE);
-  const pagedAppointments = sortedAppointments.filter(a => pagedPatientIds.includes(a.patient_id));
-
   return (
-    <div className="assistant-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <span className="dashboard-icon">👩‍⚕️</span>
-          <h1>Medical Assistant Dashboard</h1>
-        </div>
-        <button onClick={handleLogout} className="logout-button">
-          🚪 Logout
-        </button>
-      </div>
-      
-      {error && <div className="error-message">{error}</div>}
-      
-      <div className="search-container">
-        <div className="search-box">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Search patient by name..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPatientPage(1);
-            }}
-          />
-        </div>
-      </div>
-      
-      <div className="dashboard-section">
-        <div className="section-header">
-          <h2>📅 Today's Appointments</h2>
-          <span className="appointment-count">
-            {appointments.filter(a => isToday(a.time) && a.status === 'scheduled').length} appointments
-          </span>
-        </div>
-        
-        {loading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading appointments...</p>
+      <div className="assistant-dashboard">
+        <div className="dashboard-header">
+          <div className="header-left">
+            <span className="dashboard-icon">👩‍⚕️</span>
+            <h1>Medical Assistant Dashboard</h1>
           </div>
-        ) : pagedAppointments.length === 0 ? (
-          <div className="empty-state">
-            <p>No appointments scheduled for today</p>
+          <button onClick={handleLogout} className="logout-button">
+            🚪 Logout
+          </button>
+        </div>
+
+        {error && <div className="error-message">{error}</div>}
+
+        <div className="search-container">
+          <div className="search-box">
+            <span className="search-icon">🔍</span>
+            <input
+                type="text"
+                placeholder="Search patient by name..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPatientPage(1);
+                }}
+            />
           </div>
-        ) : (
-          <div className="appointments-grid">
-            {pagedAppointments.map(appt => (
-              <div key={appt.appointment_id} className="appointment-card">
-                <div className="appointment-header">
-                  <span className={`status-badge ${appt.status}`}>{appt.status}</span>
-                  <span className="appointment-time">
-                    {new Date(appt.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+          {/*<div className="date-search">
+            <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => {
+                  setDateFilter(e.target.value);
+                  setPatientPage(1);
+                }}
+                className="date-input"
+            />
+            {dateFilter && (
+                <button
+                    onClick={() => setDateFilter('')}
+                    className="clear-date"
+                >
+                  Clear
+                </button>
+            )}
+          </div>*/}
+        </div>
+
+        <div className="dashboard-section">
+          <div className="appointments-header">
+            <div className="header-main">
+              <h2>📅 All Appointments</h2>
+              <span className="appointment-count">
+              {todaysAppointmentsCount} today's appointment{todaysAppointmentsCount !== 1 ? 's' : ''}
+            </span>
+            </div>
+
+            <div className="filter-controls">
+              <div className="filter-group">
+                <span className="filter-label">Filter by:</span>
+
+                <div className="date-filter">
+                  <input
+                      type="date"
+                      value={dateFilter}
+                      onChange={(e) => {
+                        setDateFilter(e.target.value);
+                        setPatientPage(1);
+                      }}
+                      className="date-input"
+                  />
+                  {dateFilter && (
+                      <button
+                          onClick={() => setDateFilter('')}
+                          className="clear-date"
+                      >
+                        Clear
+                      </button>
+                  )}
                 </div>
-                
-                <div className="patient-info">
-                  <div className="patient-avatar">
-                    {patients[appt.patient_id]?.full_name?.charAt(0) || 'P'}
-                  </div>
-                  <div className="patient-details">
-                    <h4>{patients[appt.patient_id]?.full_name || 'Loading...'}</h4>
-                    <p>Patient ID: {appt.patient_id}</p>
-                  </div>
-                </div>
-                
-                <div className="appointment-actions">
-                  <div className="status-select">
-                    <label>Status:</label>
-                    <select 
-                      value={appt.status} 
-                      onChange={(e) => handleStatusUpdate(appt.appointment_id, e.target.value)}
-                      disabled={updatingStatus[appt.appointment_id]}
-                    >
-                      <option value="scheduled">Scheduled</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                    {updatingStatus[appt.appointment_id] && (
-                      <span className="updating-indicator">Updating...</span>
-                    )}
-                  </div>
-                  
-                  <button 
-                    onClick={() => setSelectedPatientId(appt.patient_id)}
-                    className="action-button view"
-                  >
-                    View Patient
-                  </button>
-                </div>
+
+                <label className="filter-option">
+                  <input
+                      type="checkbox"
+                      checked={showTodayOnly}
+                      onChange={() => {
+                        setShowTodayOnly(!showTodayOnly);
+                        setPatientPage(1);
+                      }}
+                  />
+                  <span>Today</span>
+                </label>
+
+                <label className="filter-option">
+                  <input
+                      type="checkbox"
+                      checked={showCompletedOnly}
+                      onChange={() => {
+                        setShowCompletedOnly(!showCompletedOnly);
+                        setPatientPage(1);
+                      }}
+                  />
+                  <span>Completed</span>
+                </label>
               </div>
-            ))}
+            </div>
           </div>
+
+          {loading ? (
+              <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading appointments...</p>
+              </div>
+          ) : Object.keys(groupedAppointments).length > 0 ? (
+              Object.entries(groupedAppointments)
+                  .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+                  .map(([date, dateAppointments]) => (
+                      <div key={date} className="date-group">
+                        <h3 className="date-header">
+                          {new Date(date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </h3>
+                        <div className="appointments-grid">
+                          {dateAppointments
+                              .sort((a, b) => new Date(a.time) - new Date(b.time))
+                              .map(appt => (
+                                  <div key={appt.appointment_id} className="appointment-card">
+                                    <div className="appointment-header">
+                                      <span className={`status-badge ${appt.status}`}>{appt.status}</span>
+                                      <span className="appointment-time">
+                            {new Date(appt.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                                    </div>
+
+                                    <div className="patient-info">
+                                      <div className="patient-avatar">
+                                        {patients[appt.patient_id]?.full_name?.charAt(0) || 'P'}
+                                      </div>
+                                      <div className="patient-details">
+                                        <h4>{patients[appt.patient_id]?.full_name || 'Loading...'}</h4>
+                                        <p>Patient ID: {appt.patient_id}</p>
+                                      </div>
+                                    </div>
+
+                                    <div className="appointment-actions">
+                                      <div className="status-select">
+                                        <label>Status:</label>
+                                        <select
+                                            value={appt.status}
+                                            onChange={(e) => handleStatusUpdate(appt.appointment_id, e.target.value)}
+                                            disabled={updatingStatus[appt.appointment_id]}
+                                        >
+                                          <option value="scheduled">Scheduled</option>
+                                          <option value="completed">Completed</option>
+                                          <option value="cancelled">Cancelled</option>
+                                        </select>
+                                        {updatingStatus[appt.appointment_id] && (
+                                            <span className="updating-indicator">Updating...</span>
+                                        )}
+                                      </div>
+
+                                      <button
+                                          onClick={() => setSelectedPatientId(appt.patient_id)}
+                                          className="action-button view"
+                                      >
+                                        View Patient
+                                      </button>
+                                    </div>
+                                  </div>
+                              ))}
+                        </div>
+                      </div>
+                  ))
+          ) : (
+              <div className="empty-state">
+                <p>No appointments found</p>
+              </div>
+          )}
+        </div>
+
+        {selectedPatientId && (
+            <PatientDetails
+                patientId={selectedPatientId}
+                token={token}
+                onClose={() => setSelectedPatientId(null)}
+            />
         )}
+
+        <style jsx>{`
+
+        .appointments-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 25px;
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+
+        .header-main {
+          display: flex;
+          align-items: center;
+          gap: 2.75rem;
+        }
+
+        .appointment-count {
+          background: #e3f2fd;
+          color: #1976d2;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-weight: 600;
+          font-size: 0.95rem;
+          white-space: nowrap;
+        }
+
+        .filter-controls {
+          display: flex;
+          align-items: center;
+        }
+
+        .filter-group {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          background: #f8f9fa;
+          padding: 8px 16px;
+          border-radius: 8px;
+          flex-wrap: wrap;
+        }
+
+        .filter-label {
+          font-weight: 500;
+          color: #5a6570;
+          font-size: 0.95rem;
+        }
+
+        .filter-option {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          padding: 4px 8px;
+          border-radius: 4px;
+          transition: background 0.2s;
+        }
+
+        .filter-option:hover {
+          background: #e9ecef;
+        }
+
+        .filter-option input {
+          margin: 0;
+          cursor: pointer;
+        }
+
+        .date-filter {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .date-input {
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+        }
+
+        .clear-date {
+          background: #f0f4f8;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background 0.2s;
+          font-size: 14px;
+        }
+
+        .clear-date:hover {
+          background: #e3eaf3;
+        }
+
+        @media (max-width: 768px) {
+          .appointments-header {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .filter-group {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .header-main {
+            width: 100%;
+            justify-content: space-between;
+            gap: 1rem;
+          }
+        }
         
-        <Pagination
-          page={patientPage}
-          total={filteredPatientIds.length}
-          pageSize={PAGE_SIZE}
-          onPageChange={setPatientPage}
-        />
-      </div>
-      
-      {selectedPatientId && (
-        <PatientDetails
-          patientId={selectedPatientId}
-          token={token}
-          onClose={() => setSelectedPatientId(null)}
-        />
-      )}
-      
-      <style jsx>{`
         .assistant-dashboard {
           max-width: 1200px;
           margin: 0 auto;
@@ -835,7 +1026,7 @@ const AssistantDashboard = () => {
           100% { transform: rotate(360deg); }
         }
       `}</style>
-    </div>
+      </div>
   );
 };
 

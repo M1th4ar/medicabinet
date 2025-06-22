@@ -1,33 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from '../../api/axios';
 
-const PAGE_SIZE = 5;
-
 const getPatientFromResponse = (data) => data.patient || data;
-
-const Pagination = ({ page, total, pageSize, onPageChange }) => {
-  const totalPages = Math.ceil(total / pageSize);
-  
-  return (
-    <div className="pagination">
-      <button 
-        onClick={() => onPageChange(page - 1)} 
-        disabled={page === 1}
-        className="pagination-button"
-      >
-        Prev
-      </button>
-      <span className="pagination-info">Page {page} of {totalPages}</span>
-      <button 
-        onClick={() => onPageChange(page + 1)} 
-        disabled={page === totalPages}
-        className="pagination-button"
-      >
-        Next
-      </button>
-    </div>
-  );
-};
 
 const ConsultationForm = ({ patientId, token, onSaved, initialNotes, consultationId }) => {
   const [notes, setNotes] = useState(initialNotes || '');
@@ -38,7 +12,7 @@ const ConsultationForm = ({ patientId, token, onSaved, initialNotes, consultatio
     setIsLoading(true);
     const config = { headers: { Authorization: `Bearer ${token}` } };
     const data = { patient_id: patientId, notes };
-    
+
     try {
       if (consultationId) {
         await axios.put(`/doctor/consultations/${consultationId}`, data, config);
@@ -54,29 +28,29 @@ const ConsultationForm = ({ patientId, token, onSaved, initialNotes, consultatio
   };
 
   return (
-    <form onSubmit={handleSubmit} className="consultation-form">
+      <form onSubmit={handleSubmit} className="consultation-form">
       <textarea
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        placeholder="Enter consultation notes"
-        required
-        rows={4}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Enter consultation notes"
+          required
+          rows={4}
       />
-      <div className="form-actions">
-        <button type="submit" className="primary-button" disabled={isLoading}>
-          {isLoading ? 'Saving...' : 'Save Consultation'}
-        </button>
-        {consultationId && (
-          <button 
-            type="button" 
-            className="secondary-button"
-            onClick={() => onSaved()}
-          >
-            Cancel
+        <div className="form-actions">
+          <button type="submit" className="primary-button" disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save Consultation'}
           </button>
-        )}
-      </div>
-    </form>
+          {consultationId && (
+              <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => onSaved()}
+              >
+                Cancel
+              </button>
+          )}
+        </div>
+      </form>
   );
 };
 
@@ -89,7 +63,7 @@ const PrescriptionForm = ({ patientId, token, onSaved, initialContent, prescript
     setIsLoading(true);
     const config = { headers: { Authorization: `Bearer ${token}` } };
     const data = { patient_id: patientId, content };
-    
+
     try {
       if (prescriptionId) {
         await axios.put(`/doctor/prescriptions/${prescriptionId}`, data, config);
@@ -105,29 +79,29 @@ const PrescriptionForm = ({ patientId, token, onSaved, initialContent, prescript
   };
 
   return (
-    <form onSubmit={handleSubmit} className="prescription-form">
+      <form onSubmit={handleSubmit} className="prescription-form">
       <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Enter prescription details"
-        required
-        rows={4}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Enter prescription details"
+          required
+          rows={4}
       />
-      <div className="form-actions">
-        <button type="submit" className="primary-button" disabled={isLoading}>
-          {isLoading ? 'Saving...' : 'Save Prescription'}
-        </button>
-        {prescriptionId && (
-          <button 
-            type="button" 
-            className="secondary-button"
-            onClick={() => onSaved()}
-          >
-            Cancel
+        <div className="form-actions">
+          <button type="submit" className="primary-button" disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save Prescription'}
           </button>
-        )}
-      </div>
-    </form>
+          {prescriptionId && (
+              <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => onSaved()}
+              >
+                Cancel
+              </button>
+          )}
+        </div>
+      </form>
   );
 };
 
@@ -140,8 +114,6 @@ const PatientDetails = ({ patientId, token, onClose }) => {
   const [editConsultationId, setEditConsultationId] = useState(null);
   const [editPrescriptionId, setEditPrescriptionId] = useState(null);
   const [patientForm, setPatientForm] = useState({});
-  const [consultationPage, setConsultationPage] = useState(1);
-  const [prescriptionPage, setPrescriptionPage] = useState(1);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -166,8 +138,6 @@ const PatientDetails = ({ patientId, token, onClose }) => {
 
   useEffect(() => {
     fetchData();
-    setConsultationPage(1);
-    setPrescriptionPage(1);
   }, [fetchData]);
 
   const handlePatientEdit = async (e) => {
@@ -207,259 +177,240 @@ const PatientDetails = ({ patientId, token, onClose }) => {
     }
   };
 
-  const pagedConsultations = consultations.slice((consultationPage - 1) * PAGE_SIZE, consultationPage * PAGE_SIZE);
-  const pagedPrescriptions = prescriptions.slice((prescriptionPage - 1) * PAGE_SIZE, prescriptionPage * PAGE_SIZE);
-
   if (loading) return (
-    <div className="modal-overlay">
-      <div className="patient-modal">
-        <div className="loading-spinner"></div>
-        <p>Loading patient details...</p>
+      <div className="modal-overlay">
+        <div className="patient-modal">
+          <div className="loading-spinner"></div>
+          <p>Loading patient details...</p>
+        </div>
       </div>
-    </div>
   );
-  
+
   if (!patient) return (
-    <div className="modal-overlay">
-      <div className="patient-modal">
-        <button onClick={onClose} className="close-button">✖</button>
-        <div className="error-message">Failed to load patient details.</div>
+      <div className="modal-overlay">
+        <div className="patient-modal">
+          <button onClick={onClose} className="close-button">✖</button>
+          <div className="error-message">Failed to load patient details.</div>
+        </div>
       </div>
-    </div>
   );
 
   return (
-    <div className="modal-overlay">
-      <div className="patient-modal">
-        <button onClick={onClose} className="close-button">✖</button>
-        
-        <div className="section">
-          <div className="section-header">
-            <h3>👤 Patient Information</h3>
-            {!editPatient && (
-              <button onClick={() => setEditPatient(true)} className="edit-button">Edit</button>
+      <div className="modal-overlay">
+        <div className="patient-modal">
+          <button onClick={onClose} className="close-button">✖</button>
+
+          <div className="section">
+            <div className="section-header">
+              <h3>👤 Patient Information</h3>
+              {!editPatient && (
+                  <button onClick={() => setEditPatient(true)} className="edit-button">Edit</button>
+              )}
+            </div>
+
+            {editPatient ? (
+                <form onSubmit={handlePatientEdit} className="patient-form">
+                  <div className="form-group">
+                    <label>Full Name</label>
+                    <input
+                        value={patientForm.full_name || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, full_name: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                        value={patientForm.email || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, email: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        value={patientForm.password || ''}
+                        onChange={e => setPatientForm(f => ({ ...f, password: e.target.value }))}
+                        required
+                    />
+                  </div>
+                  <div className="form-actions">
+                    <button type="submit" className="primary-button">Save Changes</button>
+                    <button type="button" onClick={() => setEditPatient(false)} className="secondary-button">Cancel</button>
+                  </div>
+                </form>
+            ) : (
+                <div className="patient-info-grid">
+                  <div className="info-item">
+                    <span className="info-label">ID:</span>
+                    <span className="info-value">{patient.id || patientId}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Name:</span>
+                    <span className="info-value">{patient.full_name}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Address:</span>
+                    <span className="info-value">{patient.address || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Gender:</span>
+                    <span className="info-value">{patient.gender || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Email:</span>
+                    <span className="info-value">{patient.email}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Phone:</span>
+                    <span className="info-value">{patient.phone || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Birthday:</span>
+                    <span className="info-value">{patient.birthday || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Weight:</span>
+                    <span className="info-value">{patient.weight ? `${patient.weight} kg` : 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Height:</span>
+                    <span className="info-value">{patient.height ? `${patient.height} cm` : 'N/A'}</span>
+                  </div>
+                </div>
             )}
           </div>
-          
-          {editPatient ? (
-            <form onSubmit={handlePatientEdit} className="patient-form">
-              <div className="form-group">
-                <label>Full Name</label>
-                <input 
-                  value={patientForm.full_name || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, full_name: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input 
-                  value={patientForm.email || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, email: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input 
-                  type="password"
-                  value={patientForm.password || ''} 
-                  onChange={e => setPatientForm(f => ({ ...f, password: e.target.value }))} 
-                  required 
-                />
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="primary-button">Save Changes</button>
-                <button type="button" onClick={() => setEditPatient(false)} className="secondary-button">Cancel</button>
-              </div>
-            </form>
-          ) : (
-            <div className="patient-info-grid">
-              <div className="info-item">
-                <span className="info-label">ID:</span>
-                <span className="info-value">{patient.id || patientId}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Name:</span>
-                <span className="info-value">{patient.full_name}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Address:</span>
-                <span className="info-value">{patient.address || 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Gender:</span>
-                <span className="info-value">{patient.gender || 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Email:</span>
-                <span className="info-value">{patient.email}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Phone:</span>
-                <span className="info-value">{patient.phone || 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Birthday:</span>
-                <span className="info-value">{patient.birthday || 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Weight:</span>
-                <span className="info-value">{patient.weight ? `${patient.weight} kg` : 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Height:</span>
-                <span className="info-value">{patient.height ? `${patient.height} cm` : 'N/A'}</span>
-              </div>
+
+          <div className="section">
+            <div className="section-header">
+              <h3>📝 Consultations</h3>
             </div>
-          )}
-        </div>
 
-        <div className="section">
-          <div className="section-header">
-            <h3>📝 Consultations</h3>
-          </div>
-          
-          <ConsultationForm 
-            patientId={patientId} 
-            token={token} 
-            onSaved={() => {
-              fetchData();
-              setEditConsultationId(null);
-            }} 
-          />
-          
-          {consultations.length === 0 ? (
-            <div className="empty-state">No consultations found for this patient.</div>
-          ) : (
-            <>
-              <div className="records-list">
-                {pagedConsultations.map(c => (
-                  <div key={c.consultation_id} className="record-card">
-                    {editConsultationId === c.consultation_id ? (
-                      <ConsultationForm 
-                        patientId={patientId}
-                        token={token}
-                        initialNotes={c.notes}
-                        consultationId={c.consultation_id}
-                        onSaved={() => {
-                          setEditConsultationId(null);
-                          fetchData();
-                        }}
-                      />
-                    ) : (
-                      <>
-                        <div className="record-header">
-                          <span className="record-date">
-                            {new Date(c.created_at).toLocaleDateString()} at{' '}
-                            {new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                          <div className="record-actions">
-                            <button 
-                              onClick={() => setEditConsultationId(c.consultation_id)} 
-                              className="edit-button"
-                            >
-                              Edit
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteConsultation(c.consultation_id)} 
-                              className="delete-button"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        <div className="record-content">
-                          <p>{c.notes}</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <Pagination
-                page={consultationPage}
-                total={consultations.length}
-                pageSize={PAGE_SIZE}
-                onPageChange={setConsultationPage}
-              />
-            </>
-          )}
-        </div>
+            <ConsultationForm
+                patientId={patientId}
+                token={token}
+                onSaved={() => {
+                  fetchData();
+                  setEditConsultationId(null);
+                }}
+            />
 
-        <div className="section">
-          <div className="section-header">
-            <h3>💊 Prescriptions</h3>
+            {consultations.length === 0 ? (
+                <div className="empty-state">No consultations found for this patient.</div>
+            ) : (
+                <div className="records-list">
+                  {consultations.map(c => (
+                      <div key={c.consultation_id} className="record-card">
+                        {editConsultationId === c.consultation_id ? (
+                            <ConsultationForm
+                                patientId={patientId}
+                                token={token}
+                                initialNotes={c.notes}
+                                consultationId={c.consultation_id}
+                                onSaved={() => {
+                                  setEditConsultationId(null);
+                                  fetchData();
+                                }}
+                            />
+                        ) : (
+                            <>
+                              <div className="record-header">
+                        <span className="record-date">
+                          {new Date(c.created_at).toLocaleDateString()} at{' '}
+                          {new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                                <div className="record-actions">
+                                  <button
+                                      onClick={() => setEditConsultationId(c.consultation_id)}
+                                      className="edit-button"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                      onClick={() => handleDeleteConsultation(c.consultation_id)}
+                                      className="delete-button"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="record-content">
+                                <p>{c.notes}</p>
+                              </div>
+                            </>
+                        )}
+                      </div>
+                  ))}
+                </div>
+            )}
           </div>
-          
-          <PrescriptionForm 
-            patientId={patientId} 
-            token={token} 
-            onSaved={() => {
-              fetchData();
-              setEditPrescriptionId(null);
-            }} 
-          />
-          
-          {prescriptions.length === 0 ? (
-            <div className="empty-state">No prescriptions found for this patient.</div>
-          ) : (
-            <>
-              <div className="records-list">
-                {pagedPrescriptions.map(p => (
-                  <div key={p.prescription_id} className="record-card">
-                    {editPrescriptionId === p.prescription_id ? (
-                      <PrescriptionForm 
-                        patientId={patientId}
-                        token={token}
-                        initialContent={p.content}
-                        prescriptionId={p.prescription_id}
-                        onSaved={() => {
-                          setEditPrescriptionId(null);
-                          fetchData();
-                        }}
-                      />
-                    ) : (
-                      <>
-                        <div className="record-header">
-                          <span className="record-date">
-                            {new Date(p.created_at).toLocaleDateString()} at{' '}
-                            {new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                          <div className="record-actions">
-                            <button 
-                              onClick={() => setEditPrescriptionId(p.prescription_id)} 
-                              className="edit-button"
-                            >
-                              Edit
-                            </button>
-                            <button 
-                              onClick={() => handleDeletePrescription(p.prescription_id)} 
-                              className="delete-button"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        <div className="record-content">
-                          <p>{p.content}</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <Pagination
-                page={prescriptionPage}
-                total={prescriptions.length}
-                pageSize={PAGE_SIZE}
-                onPageChange={setPrescriptionPage}
-              />
-            </>
-          )}
+
+          <div className="section">
+            <div className="section-header">
+              <h3>💊 Prescriptions</h3>
+            </div>
+
+            <PrescriptionForm
+                patientId={patientId}
+                token={token}
+                onSaved={() => {
+                  fetchData();
+                  setEditPrescriptionId(null);
+                }}
+            />
+
+            {prescriptions.length === 0 ? (
+                <div className="empty-state">No prescriptions found for this patient.</div>
+            ) : (
+                <div className="records-list">
+                  {prescriptions.map(p => (
+                      <div key={p.prescription_id} className="record-card">
+                        {editPrescriptionId === p.prescription_id ? (
+                            <PrescriptionForm
+                                patientId={patientId}
+                                token={token}
+                                initialContent={p.content}
+                                prescriptionId={p.prescription_id}
+                                onSaved={() => {
+                                  setEditPrescriptionId(null);
+                                  fetchData();
+                                }}
+                            />
+                        ) : (
+                            <>
+                              <div className="record-header">
+                        <span className="record-date">
+                          {new Date(p.created_at).toLocaleDateString()} at{' '}
+                          {new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                                <div className="record-actions">
+                                  <button
+                                      onClick={() => setEditPrescriptionId(p.prescription_id)}
+                                      className="edit-button"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                      onClick={() => handleDeletePrescription(p.prescription_id)}
+                                      className="delete-button"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="record-content">
+                                <p>{p.content}</p>
+                              </div>
+                            </>
+                        )}
+                      </div>
+                  ))}
+                </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 
@@ -468,9 +419,13 @@ const DoctorDashboard = () => {
   const [patients, setPatients] = useState({});
   const [error, setError] = useState('');
   const [selectedPatientId, setSelectedPatientId] = useState(null);
-  const [patientPage, setPatientPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    today: false,
+    completed: false,
+    date: ''
+  });
 
   const token = localStorage.getItem('token');
 
@@ -485,10 +440,10 @@ const DoctorDashboard = () => {
       const patientData = {};
 
       await Promise.all(
-        patientIds.map(async (id) => {
-          const pRes = await axios.get(`/doctor/patients/${id}`, config);
-          patientData[id] = getPatientFromResponse(pRes.data);
-        })
+          patientIds.map(async (id) => {
+            const pRes = await axios.get(`/doctor/patients/${id}`, config);
+            patientData[id] = getPatientFromResponse(pRes.data);
+          })
       );
 
       setPatients(patientData);
@@ -527,17 +482,54 @@ const DoctorDashboard = () => {
     window.location.href = '/login';
   };
 
+  const handleFilterChange = (filterName, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterName]: value
+    }));
+  };
+
   const isToday = (dateStr) => {
     const today = new Date();
     const apptDate = new Date(dateStr);
     return (
-      today.getFullYear() === apptDate.getFullYear() &&
-      today.getMonth() === apptDate.getMonth() &&
-      today.getDate() === apptDate.getDate()
+        today.getFullYear() === apptDate.getFullYear() &&
+        today.getMonth() === apptDate.getMonth() &&
+        today.getDate() === apptDate.getDate()
     );
   };
 
-  const sortedAppointments = [...appointments].sort((a, b) => {
+  const matchesDate = (dateStr, selectedDate) => {
+    if (!selectedDate) return true;
+    const apptDate = new Date(dateStr);
+    const filterDate = new Date(selectedDate);
+    return (
+        apptDate.getFullYear() === filterDate.getFullYear() &&
+        apptDate.getMonth() === filterDate.getMonth() &&
+        apptDate.getDate() === filterDate.getDate()
+    );
+  };
+
+  const filteredAppointments = appointments.filter(appt => {
+    // Apply today filter if enabled
+    if (filters.today && !isToday(appt.time)) return false;
+
+    // Apply completed filter if enabled
+    if (filters.completed && appt.status !== 'completed') return false;
+
+    // Apply date filter if set
+    if (filters.date && !matchesDate(appt.time, filters.date)) return false;
+
+    // Apply search filter
+    const patient = patients[appt.patient_id];
+    if (searchTerm && !patient?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
+
+    return true;
+  });
+
+  const sortedAppointments = [...filteredAppointments].sort((a, b) => {
     const aToday = isToday(a.time) && a.status === 'scheduled';
     const bToday = isToday(b.time) && b.status === 'scheduled';
     if (aToday && !bToday) return -1;
@@ -545,129 +537,154 @@ const DoctorDashboard = () => {
     return new Date(b.time) - new Date(a.time);
   });
 
-  const uniquePatientIds = [...new Set(sortedAppointments.map(a => a.patient_id))];
-  const filteredPatientIds = uniquePatientIds.filter(id => {
-    const patient = patients[id];
-    return patient?.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
-  const patientStart = (patientPage - 1) * PAGE_SIZE;
-  const pagedPatientIds = filteredPatientIds.slice(patientStart, patientStart + PAGE_SIZE);
-  const pagedAppointments = sortedAppointments.filter(a => pagedPatientIds.includes(a.patient_id));
-
   return (
-    <div className="doctor-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <span className="dashboard-icon">👨‍⚕️</span>
-          <h1>Doctor Dashboard</h1>
+      <div className="doctor-dashboard">
+        <div className="dashboard-header">
+          <div className="header-left">
+            <span className="dashboard-icon">👨‍⚕️</span>
+            <h1>Doctor Dashboard</h1>
+          </div>
+          <button onClick={handleLogout} className="logout-button">
+            🚪 Logout
+          </button>
         </div>
-        <button onClick={handleLogout} className="logout-button">
-          🚪 Logout
-        </button>
-      </div>
-      
-      {error && <div className="error-message">{error}</div>}
-      
-      <div className="search-container">
-        <div className="search-box">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Search patient by name..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPatientPage(1);
-            }}
-          />
+
+        {error && <div className="error-message">{error}</div>}
+
+        <div className="search-container">
+          <div className="search-box">
+            <span className="search-icon">🔍</span>
+            <input
+                type="text"
+                placeholder="Search patient by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
-      </div>
-      
-      <div className="dashboard-section">
-        <div className="section-header">
-          <h2>📅 Today's Appointments</h2>
-          <span className="appointment-count">
-            {appointments.filter(a => isToday(a.time) && a.status === 'scheduled').length} appointments
+
+        <div className="dashboard-section">
+          <div className="section-header">
+            <h2>Appointments</h2>
+            <span className="appointment-count">
+            {filteredAppointments.length} appointments
           </span>
-        </div>
-        
-        {loading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading appointments...</p>
           </div>
-        ) : pagedAppointments.length === 0 ? (
-          <div className="empty-state">
-            <p>No appointments found</p>
-          </div>
-        ) : (
-          <div className="appointments-grid">
-            {pagedAppointments.map(appt => (
-              <div key={appt.appointment_id} className="appointment-card">
-                <div className="appointment-header">
-                  <span className={`status-badge ${appt.status}`}>{appt.status}</span>
-                  <span className="appointment-time">
-                    {new Date(appt.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-                
-                <div className="patient-info">
-                  <div className="patient-avatar">
-                    {patients[appt.patient_id]?.full_name?.charAt(0) || 'P'}
-                  </div>
-                  <div className="patient-details">
-                    <h4>{patients[appt.patient_id]?.full_name || 'Loading...'}</h4>
-                    <p>Patient ID: {appt.patient_id}</p>
-                  </div>
-                </div>
-                
-                <div className="appointment-actions">
-                  {appt.status === 'scheduled' && (
-                    <>
-                      <button 
-                        onClick={() => handleStatusUpdate(appt.appointment_id, 'completed')}
-                        className="action-button complete"
-                      >
-                        Complete
-                      </button>
-                      <button 
-                        onClick={() => handleStatusUpdate(appt.appointment_id, 'cancelled')}
-                        className="action-button cancel"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                  <button 
-                    onClick={() => setSelectedPatientId(appt.patient_id)}
-                    className="action-button view"
+
+          <div className="filters-container">
+            <div className="filter-group">
+              <label className="filter-checkbox">
+                <input
+                    type="checkbox"
+                    checked={filters.today}
+                    onChange={(e) => handleFilterChange('today', e.target.checked)}
+                />
+                <span>Today</span>
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                    type="checkbox"
+                    checked={filters.completed}
+                    onChange={(e) => handleFilterChange('completed', e.target.checked)}
+                />
+                <span>Completed</span>
+              </label>
+            </div>
+
+            <div className="date-filter-group">
+              <label>Filter by date:</label>
+              <input
+                  type="date"
+                  value={filters.date}
+                  onChange={(e) => handleFilterChange('date', e.target.value)}
+              />
+              {filters.date && (
+                  <button
+                      className="clear-date"
+                      onClick={() => handleFilterChange('date', '')}
                   >
-                    View Patient
+                    Clear
                   </button>
-                </div>
-              </div>
-            ))}
+              )}
+            </div>
           </div>
+
+          {loading ? (
+              <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading appointments...</p>
+              </div>
+          ) : sortedAppointments.length === 0 ? (
+              <div className="empty-state">
+                <p>No appointments found</p>
+              </div>
+          ) : (
+              <div className="appointments-grid">
+                {sortedAppointments.map(appt => (
+                    <div key={appt.appointment_id} className="appointment-card">
+                      <div className="appointment-header">
+                        <span className={`status-badge ${appt.status}`}>{appt.status}</span>
+                        <span className="appointment-time">
+                    {new Date(appt.time).toLocaleString([], {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                      </div>
+
+                      <div className="patient-info">
+                        <div className="patient-avatar">
+                          {patients[appt.patient_id]?.full_name?.charAt(0) || 'P'}
+                        </div>
+                        <div className="patient-details">
+                          <h4>{patients[appt.patient_id]?.full_name || 'Loading...'}</h4>
+                          <p>Patient ID: {appt.patient_id}</p>
+                        </div>
+                      </div>
+
+                      <div className="appointment-actions">
+                        {appt.status === 'scheduled' && (
+                            <>
+                              <button
+                                  onClick={() => handleStatusUpdate(appt.appointment_id, 'completed')}
+                                  className="action-button complete"
+                              >
+                                Complete
+                              </button>
+                              <button
+                                  onClick={() => handleStatusUpdate(appt.appointment_id, 'cancelled')}
+                                  className="action-button cancel"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                        )}
+                        <button
+                            onClick={() => setSelectedPatientId(appt.patient_id)}
+                            className="action-button view"
+                        >
+                          View Patient
+                        </button>
+                      </div>
+                    </div>
+                ))}
+              </div>
+          )}
+        </div>
+
+        {selectedPatientId && (
+            <PatientDetails
+                patientId={selectedPatientId}
+                token={token}
+                onClose={() => setSelectedPatientId(null)}
+            />
         )}
-        
-        <Pagination
-          page={patientPage}
-          total={filteredPatientIds.length}
-          pageSize={PAGE_SIZE}
-          onPageChange={setPatientPage}
-        />
-      </div>
-      
-      {selectedPatientId && (
-        <PatientDetails
-          patientId={selectedPatientId}
-          token={token}
-          onClose={() => setSelectedPatientId(null)}
-        />
-      )}
-      
-      <style jsx>{`
+
+        <style jsx>{`
         .doctor-dashboard {
           max-width: 1200px;
           margin: 0 auto;
@@ -771,6 +788,60 @@ const DoctorDashboard = () => {
           font-size: 0.9rem;
         }
         
+        .filters-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+        
+        .filter-group {
+          display: flex;
+          gap: 20px;
+        }
+        
+        .filter-checkbox {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+        }
+        
+        .filter-checkbox input {
+          width: 18px;
+          height: 18px;
+        }
+        
+        .date-filter-group {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        .date-filter-group label {
+          font-weight: 500;
+        }
+        
+        .date-filter-group input {
+          padding: 8px 12px;
+          border: 1px solid #e0e0e0;
+          border-radius: 6px;
+        }
+        
+        .clear-date {
+          padding: 8px 12px;
+          background: #f0f0f0;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+        
+        .clear-date:hover {
+          background: #e0e0e0;
+        }
+        
         .appointments-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -823,6 +894,7 @@ const DoctorDashboard = () => {
         .appointment-time {
           font-weight: 600;
           color: #7f8c8d;
+          font-size: 0.9rem;
         }
         
         .patient-info {
@@ -896,37 +968,6 @@ const DoctorDashboard = () => {
         
         .action-button.view:hover {
           background: #1976d2;
-        }
-        
-        .pagination {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin-top: 25px;
-          gap: 15px;
-        }
-        
-        .pagination-button {
-          padding: 8px 16px;
-          background: #f0f4f8;
-          border: 1px solid #dbe1e8;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: background 0.3s;
-        }
-        
-        .pagination-button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        
-        .pagination-button:hover:not(:disabled) {
-          background: #e3eaf3;
-        }
-        
-        .pagination-info {
-          font-size: 0.95rem;
-          color: #5a6570;
         }
         
         .empty-state {
@@ -1175,7 +1216,7 @@ const DoctorDashboard = () => {
           100% { transform: rotate(360deg); }
         }
       `}</style>
-    </div>
+      </div>
   );
 };
 

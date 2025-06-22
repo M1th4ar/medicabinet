@@ -96,7 +96,7 @@ const DoctorAssistant = () => {
                             onChange={e => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button 
+                    <button
                         className="add-button"
                         onClick={() => { setShowForm(true); setEditId(null); }}
                     >
@@ -110,9 +110,9 @@ const DoctorAssistant = () => {
                     </button>
                 </div>
             </div>
-            
+
             {error && <div className="error-message">{error}</div>}
-            
+
             {loading ? (
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
@@ -121,7 +121,7 @@ const DoctorAssistant = () => {
             ) : filteredAssistants.length === 0 ? (
                 <div className="empty-state">
                     <p>No assistants found</p>
-                    <button 
+                    <button
                         className="add-button"
                         onClick={() => { setShowForm(true); setEditId(null); }}
                     >
@@ -141,7 +141,7 @@ const DoctorAssistant = () => {
                                     <p className="email">{a.email}</p>
                                 </div>
                             </div>
-                            
+
                             <div className="card-details">
                                 <div className="detail-item">
                                     <span className="label">Phone:</span>
@@ -156,7 +156,7 @@ const DoctorAssistant = () => {
                                     <span className="value">{a.address || 'N/A'}</span>
                                 </div>
                             </div>
-                            
+
                             <div className="card-actions">
                                 <button
                                     className="edit-button"
@@ -168,7 +168,7 @@ const DoctorAssistant = () => {
                                 >
                                     Edit
                                 </button>
-                                <button 
+                                <button
                                     className="delete-button"
                                     onClick={() => handleDelete(a.id)}
                                 >
@@ -190,7 +190,7 @@ const DoctorAssistant = () => {
                             ✖
                         </button>
                         <h3 className="modal-title">{editId ? 'Edit Assistant' : 'Add Assistant'}</h3>
-                        
+
                         <form onSubmit={handleSubmit} className="assistant-form">
                             <div className="form-group">
                                 <label>Full Name</label>
@@ -202,7 +202,7 @@ const DoctorAssistant = () => {
                                     onChange={e => setAssistantForm(f => ({ ...f, full_name: e.target.value }))}
                                 />
                             </div>
-                            
+
                             <div className="form-group">
                                 <label>Email</label>
                                 <input
@@ -213,7 +213,7 @@ const DoctorAssistant = () => {
                                     onChange={e => setAssistantForm(f => ({ ...f, email: e.target.value }))}
                                 />
                             </div>
-                            
+
                             <div className="form-group">
                                 <label>Password {editId && '(leave blank to keep current)'}</label>
                                 <input
@@ -224,7 +224,7 @@ const DoctorAssistant = () => {
                                     onChange={e => setAssistantForm(f => ({ ...f, password: e.target.value }))}
                                 />
                             </div>
-                            
+
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Phone</label>
@@ -236,7 +236,7 @@ const DoctorAssistant = () => {
                                         onChange={e => setAssistantForm(f => ({ ...f, phone: e.target.value }))}
                                     />
                                 </div>
-                                
+
                                 <div className="form-group">
                                     <label>Birthday</label>
                                     <input
@@ -248,7 +248,7 @@ const DoctorAssistant = () => {
                                     />
                                 </div>
                             </div>
-                            
+
                             <div className="form-group">
                                 <label>Address</label>
                                 <input
@@ -259,13 +259,13 @@ const DoctorAssistant = () => {
                                     onChange={e => setAssistantForm(f => ({ ...f, address: e.target.value }))}
                                 />
                             </div>
-                            
+
                             <div className="form-actions">
                                 <button type="submit" className="save-button">
                                     {editId ? 'Update Assistant' : 'Create Assistant'}
                                 </button>
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     className="cancel-button"
                                     onClick={resetForm}
                                 >
@@ -276,7 +276,7 @@ const DoctorAssistant = () => {
                     </div>
                 </div>
             )}
-            
+
             <style jsx>{`
                 .assistant-management {
                     max-width: 1200px;
@@ -285,7 +285,7 @@ const DoctorAssistant = () => {
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                     color: #2c3e50;
                 }
-                
+
                 .header {
                     display: flex;
                     flex-direction: column;
@@ -293,27 +293,27 @@ const DoctorAssistant = () => {
                     padding-bottom: 15px;
                     border-bottom: 1px solid #e0e0e0;
                 }
-                
+
                 .header h2 {
                     display: flex;
                     align-items: center;
                     gap: 10px;
                     margin: 0 0 20px 0;
                 }
-                
+
                 .header-actions {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
                     gap: 20px;
                 }
-                
+
                 .search-container {
                     position: relative;
                     flex: 1;
                     max-width: 400px;
                 }
-                
+
                 .search-container input {
                     width: 100%;
                     padding: 12px 20px 12px 40px;
@@ -321,7 +321,7 @@ const DoctorAssistant = () => {
                     border-radius: 8px;
                     font-size: 16px;
                 }
-                
+
                 .search-icon {
                     position: absolute;
                     left: 15px;
@@ -329,7 +329,7 @@ const DoctorAssistant = () => {
                     transform: translateY(-50%);
                     color: #7f8c8d;
                 }
-                
+
                 .add-button {
                     background: #3498db;
                     color: white;
@@ -343,7 +343,7 @@ const DoctorAssistant = () => {
                     gap: 5px;
                     transition: background 0.3s;
                 }
-                
+
                 .add-button:hover {
                     background: #2980b9;
                 }
@@ -362,7 +362,7 @@ const DoctorAssistant = () => {
                 .logout-button:hover {
                     background: #c0392b;
                 }
-                
+
                 .error-message {
                     background: #f8d7da;
                     color: #721c24;
@@ -370,7 +370,7 @@ const DoctorAssistant = () => {
                     border-radius: 8px;
                     margin-bottom: 25px;
                 }
-                
+
                 .loading-container {
                     display: flex;
                     flex-direction: column;
@@ -378,7 +378,7 @@ const DoctorAssistant = () => {
                     justify-content: center;
                     padding: 40px;
                 }
-                
+
                 .loading-spinner {
                     width: 50px;
                     height: 50px;
@@ -388,7 +388,7 @@ const DoctorAssistant = () => {
                     animation: spin 1s linear infinite;
                     margin-bottom: 20px;
                 }
-                
+
                 .empty-state {
                     text-align: center;
                     padding: 40px 20px;
@@ -396,18 +396,18 @@ const DoctorAssistant = () => {
                     border-radius: 10px;
                     margin: 20px 0;
                 }
-                
+
                 .empty-state p {
                     color: #7f8c8d;
                     margin-bottom: 20px;
                 }
-                
+
                 .assistant-grid {
                     display: grid;
                     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
                     gap: 20px;
                 }
-                
+
                 .assistant-card {
                     background: white;
                     border-radius: 10px;
@@ -415,12 +415,12 @@ const DoctorAssistant = () => {
                     padding: 20px;
                     transition: transform 0.3s, box-shadow 0.3s;
                 }
-                
+
                 .assistant-card:hover {
                     transform: translateY(-5px);
                     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
                 }
-                
+
                 .card-header {
                     display: flex;
                     align-items: center;
@@ -429,7 +429,7 @@ const DoctorAssistant = () => {
                     padding-bottom: 15px;
                     border-bottom: 1px solid #f0f0f0;
                 }
-                
+
                 .avatar {
                     width: 50px;
                     height: 50px;
@@ -442,44 +442,44 @@ const DoctorAssistant = () => {
                     font-size: 1.4rem;
                     font-weight: 600;
                 }
-                
+
                 .card-header h3 {
                     margin: 0 0 5px 0;
                     font-size: 1.2rem;
                 }
-                
+
                 .email {
                     margin: 0;
                     color: #7f8c8d;
                     font-size: 0.9rem;
                 }
-                
+
                 .card-details {
                     margin-bottom: 20px;
                 }
-                
+
                 .detail-item {
                     display: flex;
                     margin-bottom: 10px;
                 }
-                
+
                 .label {
                     font-weight: 600;
                     width: 90px;
                     color: #5a6570;
                     font-size: 0.9rem;
                 }
-                
+
                 .value {
                     flex: 1;
                     font-size: 0.95rem;
                 }
-                
+
                 .card-actions {
                     display: flex;
                     gap: 10px;
                 }
-                
+
                 .edit-button, .delete-button {
                     flex: 1;
                     padding: 8px 12px;
@@ -489,25 +489,25 @@ const DoctorAssistant = () => {
                     cursor: pointer;
                     transition: background 0.3s;
                 }
-                
+
                 .edit-button {
                     background: #e3f2fd;
                     color: #1976d2;
                 }
-                
+
                 .edit-button:hover {
                     background: #bbdefb;
                 }
-                
+
                 .delete-button {
                     background: #ffebee;
                     color: #d32f2f;
                 }
-                
+
                 .delete-button:hover {
                     background: #ffcdd2;
                 }
-                
+
                 .modal-overlay {
                     position: fixed;
                     top: 0;
@@ -520,17 +520,17 @@ const DoctorAssistant = () => {
                     justify-content: center;
                     z-index: 1000;
                 }
-                
+
                 .modal {
                     background: white;
                     border-radius: 12px;
                     width: 90%;
                     max-width: 500px;
-                    padding: 30px;
+                    padding: 4rem;
                     position: relative;
                     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
                 }
-                
+
                 .close-button {
                     position: absolute;
                     top: 15px;
@@ -541,48 +541,49 @@ const DoctorAssistant = () => {
                     color: #7f8c8d;
                     font-size: 1.5rem;
                 }
-                
+
                 .modal-title {
                     margin-top: 0;
                     margin-bottom: 25px;
                     padding-bottom: 15px;
                     border-bottom: 1px solid #eee;
                 }
-                
+
                 .assistant-form .form-group {
                     margin-bottom: 20px;
                 }
-                
+
                 .assistant-form label {
                     display: block;
                     margin-bottom: 8px;
                     font-weight: 500;
                     font-size: 0.95rem;
                 }
-                
+
                 .assistant-form input {
                     width: 100%;
-                    padding: 12px 15px;
+                    padding: 0.75rem 0rem 0.75rem 0.5rem;
                     border: 1px solid #ddd;
                     border-radius: 8px;
                     font-size: 1rem;
                 }
-                
+
+
                 .form-row {
                     display: flex;
                     gap: 20px;
                 }
-                
+
                 .form-row .form-group {
                     flex: 1;
                 }
-                
+
                 .form-actions {
                     display: flex;
                     gap: 15px;
                     margin-top: 20px;
                 }
-                
+
                 .save-button {
                     background: #3498db;
                     color: white;
@@ -594,11 +595,11 @@ const DoctorAssistant = () => {
                     flex: 1;
                     transition: background 0.3s;
                 }
-                
+
                 .save-button:hover {
                     background: #2980b9;
                 }
-                
+
                 .cancel-button {
                     background: #f0f4f8;
                     color: #2c3e50;
@@ -610,11 +611,11 @@ const DoctorAssistant = () => {
                     flex: 1;
                     transition: background 0.3s;
                 }
-                
+
                 .cancel-button:hover {
                     background: #e3eaf3;
                 }
-                
+
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
